@@ -1,0 +1,30 @@
+
+*.log
+*.idea
+*.old
+
+.csv
+.db_tables.py
+
+.env
+
+.db
+
+# userfiles
+examples_alch/
+migrations_sync/
+
+
+
+.mypy_cache/
+__pycache__/
+.vscode/
+.venv/
+venv2/
+.venv2/
+
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json

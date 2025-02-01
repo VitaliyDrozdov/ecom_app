@@ -1,0 +1,44 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.6.0
+  hooks:
+  -   id: check-yaml
+  -   id: end-of-file-fixer
+  -   id: trailing-whitespace
+  -   id: check-yaml
+
+- repo: https://github.com/psf/black
+  rev: 24.4.2
+  hooks:
+    - id: black
+      args:
+      - --line-length=79
+      exclude: "(__init__\\.py|db\\.py|)"
+
+
+
+- repo: https://github.com/pycqa/isort
+  rev: 5.13.2
+  hooks:
+    - id: isort
+      exclude: __init__.py
+
+- repo: https://github.com/PyCQA/flake8
+  rev: 7.0.0
+  hooks:
+    - id: flake8
+      args: ["--ignore=E712"]
+      exclude: __init__.py
+
+
+
+
+- repo: local
+  hooks:
+    - id: export-dev-requirements
+      name: Export DEVELOPMENT requirements
+      language: system
+      pass_filenames: false
+      # entry: poetry export --dev --without-hashes --output ./requirements_dev.txt
+      entry: poetry export --without-hashes --output ./requirements_dev.txt
+      files: ^(pyproject.toml|poetry.lock)$
