@@ -13,6 +13,8 @@
 # userfiles
 examples_alch/
 migrations_sync/
+db_depends_sync.py
+*_sync.py
 
 
 .mypy_cache/
