@@ -15,6 +15,7 @@ class Product(Base):
     image_url = Column(String)
     stock = Column(Integer)
     category_id = Column(Integer, ForeignKey("categories.id"))
+    supplier_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     rating = Column(Float)
     is_active = Column(Boolean, default=True)
 
