@@ -94,7 +94,7 @@ async def login(
         user.username,
         user.id,
         user.is_admin,
-        user.is_suplier,
+        user.is_supplier,
         user.is_customer,
         expires_delta=timedelta(minutes=20),
     )
