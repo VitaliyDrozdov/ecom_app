@@ -15,6 +15,7 @@ examples_alch/
 migrations_sync/
 db_depends_sync.py
 *_sync.py
+*depreciated.py
 
 
 .mypy_cache/
