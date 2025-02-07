@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, update
@@ -95,7 +95,20 @@ async def delete_user(
         )
 
 
-# TODO: refactor. Заменить во всех местах проверку админа,
+def role_required(allowed_roles: List[str]):
+    def check_role(get_user: Annotated[dict, Depends(get_current_user)]):
+
+        if not any(get_user.get(role, False) for role in allowed_roles):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have permission to access this resource",
+            )
+        return get_user
+
+    return check_role
+
+
+# TODO: refactor. Можно заменить во всех местах проверку админа,
 # на новую зависимость.
 # async def admin_required(get_user: Annotated[dict,
 #                       Depends(get_current_user)]):
@@ -107,7 +120,8 @@ async def delete_user(
 #     return get_user
 
 
-# TODO: Либо так сделать с вложенной зависимостью, если несколько ролей:
+# TODO: Либо так сделать с вложенной зависимостью, если несколько ролей
+# (в том случае, если роли в отдельной таблице):
 # def role_required(allowed_rolles: List[str]):
 #     async def dependency(get_user: Annotated[
 # dict, Depends(get_current_user)

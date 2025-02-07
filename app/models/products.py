@@ -19,7 +19,7 @@ class Product(Base):
     rating = Column(Float)
     is_active = Column(Boolean, default=True)
 
-    category = relationship("Category", back_populates="products")
+    category = relationship("Category", back_populates="ratings")
 
 
 # from sqlalchemy.schema import CreateTable

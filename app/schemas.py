@@ -21,3 +21,16 @@ class CreateUser(BaseModel):
     username: str
     email: str
     password: str
+
+
+class CreateRating(BaseModel):
+    grade: float
+    user: int
+    product: int
+
+
+class CreateReview(BaseModel):
+    user: int
+    product: int
+    rating: int
+    comment: str
