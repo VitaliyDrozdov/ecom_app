@@ -179,6 +179,7 @@ async def delete_product(
     product_delete = await db.scalar(
         select(Product).where(Product.slug == product_slug)
     )
+
     if product_delete is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
