@@ -18,6 +18,7 @@ async def all_products(db: Annotated[AsyncSession, Depends(get_db)]):
     products = await db.scalars(
         select(Product).where(Product.is_active == True, Product.stock > 0)
     )
+    # TODO: проверить. Нужно заменить на products.all()
     if not products:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -24,13 +24,20 @@ class Review(Base):
     rating_id = Column(Integer, ForeignKey("ratings.id"), nullable=False)
     comment = Column(Text, nullable=False)
     comment_date = Column(
-        DateTime, default=lambda: dt.datetime.now(dt.timezone.utc)
+        DateTime(timezone=True),
+        default=lambda: dt.datetime.now(dt.timezone.utc),
     )
     is_active = Column(Boolean, default=True)
 
     user = relationship("User", backref="reviews")
     product = relationship("Product", backref="reviews")
-    rating = relationship("Rating", back_populates="review", uselist=False)
+    rating = relationship(
+        "Rating",
+        back_populates="review",
+        uselist=False,
+        cascade="all, delete-orphan",
+        single_parent=True,
+    )
 
 
 class Rating(Base):
