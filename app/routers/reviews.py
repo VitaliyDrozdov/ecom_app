@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy import exists, func, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import load_only, selectinload
 
 from app.backend.db_depends import get_db
 from app.models import Product, Rating, Review
@@ -20,6 +20,15 @@ async def all_reviews(db: Annotated[AsyncSession, Depends(get_db)]):
         select(Review)
         .options(selectinload(Review.rating).load_only(Rating.grade))
         .where(Review.is_active == True)
+        .options(
+            load_only(
+                Review.id,
+                Review.product_id,
+                Review.comment,
+                Review.user_id,
+                Review.comment_date,
+            )
+        )
     )
     reviews_res = reviews.all()
     if not reviews_res:
@@ -43,12 +52,19 @@ async def product_reviews(
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"""Product with slug {product_slug}
-            not found or product.is_active==False""",
+            detail=(
+                f"Product with slug {product_slug} "
+                "not found or product.is_active==False"
+            ),
         )
     reviews = await db.scalars(
-        select(Review).where(
-            Review.is_active == True, Review.product_id == product.id
+        select(Review)
+        .options(selectinload(Review.rating).load_only(Rating.grade))
+        .where(Review.is_active == True, Review.product_id == product.id)
+        .options(
+            load_only(
+                Review.comment, Review.id, Review.user_id, Review.comment_date
+            )
         )
     )
     reviews_all = reviews.all()
@@ -57,7 +73,6 @@ async def product_reviews(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"No reviews found for product {product_slug}",
         )
-
     return reviews_all
 
 
@@ -71,6 +86,14 @@ async def add_review(
         try:
             user_id = cur_user.get("id")
             product_id = create_review.product_id
+            check_product_exists = await db.scalar(
+                select(Product).where(Product.id == product_id)
+            )
+            if not check_product_exists:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="There is no product with product_id provided",
+                )
             check_review_exists = await db.scalar(
                 select(
                     exists().where(
@@ -96,8 +119,6 @@ async def add_review(
                 rating=new_rating_obj,
             )
             db.add(new_review_obj)
-            # await db.commit()
-            # await db.refresh(new_review_obj)
             avg_rating = await db.scalar(
                 select(func.avg(Rating.grade)).where(
                     Rating.product_id == product_id, Rating.is_active == True
@@ -109,30 +130,11 @@ async def add_review(
                     .where(Product.id == product_id)
                     .values(rating=avg_rating)
                 )
-                # Вариант 2 (выбираются все модели Rating). Могу быть проблемы
-                # с памятью, когда очень много записей рейтингов для товара.
-                # ratings = await db.scalars(d
-                #     select(Rating).where(
-                #         Rating.product_id == create_review.product_id,
-                #         Rating.is_active == True,
-                #     ),
-                # )
-                # ratings_all = ratings.all()
-                # if ratings_all:
-                #     avg_rating = sum(r.grade for r in ratings_all) /
-                # len(ratings_all)
-                #     product_obj = await db.scalar(
-                #         select(Product).where(
-                # Product.id == create_review.product_id)
-                #     )
-                #     product_obj.rating = avg_rating
-                # await db.commit()
                 return {
                     "status_code": status.HTTP_201_CREATED,
                     "transaction": "Successful",
                 }
         except SQLAlchemyError as e:
-            # await db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail=f"error:\n {e}"
             )
@@ -154,20 +156,6 @@ async def delete_review(
         )
     review.is_active = False
     await db.commit()
-    # Опционально, можете обновить рейтинг товара, если необходимо
-    # product = await db.scalar(
-    #     select(Product).where(Product.id == review.product_id)
-    # )
-    # ratings = await db.scalars(
-    #     select(Rating).where(
-    #         Rating.product_id == product.id, Rating.is_active == True
-    #     )
-    # )
-    # new_rating = sum(r.grade for r in ratings) / len(ratings)
-    # if ratings else 0
-    # product.rating = new_rating
-    # await db.commit()
-
     return {
         "status_code": status.HTTP_200_OK,
         "transaction": "Review deleted successfully",

@@ -106,32 +106,3 @@ def role_required(allowed_roles: List[str]):
         return get_user
 
     return check_role
-
-
-# TODO: refactor. Можно заменить во всех местах проверку админа,
-# на новую зависимость.
-# async def admin_required(get_user: Annotated[dict,
-#                       Depends(get_current_user)]):
-#     if not get_user.get("is_admin"):
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN,
-#             detail="You must be an admin user for this",
-#         )
-#     return get_user
-
-
-# TODO: Либо так сделать с вложенной зависимостью, если несколько ролей
-# (в том случае, если роли в отдельной таблице):
-# def role_required(allowed_rolles: List[str]):
-#     async def dependency(get_user: Annotated[
-# dict, Depends(get_current_user)
-# ]):
-#         user_roles = get_user.get("roles", list())
-#         if not any(role in allowed_rolles for role in user_roles):
-#             raise HTTPException(
-#                 status_code=status.HTTP_403_FORBIDDEN,
-#                 detail="You do not have permission to access this resource",
-#             )
-#         return get_user
-
-#     return dependency
