@@ -9,6 +9,9 @@
 .env
 
 .db
+.bak
+.dir
+.dat
 
 # userfiles
 examples_alch/
@@ -16,6 +19,8 @@ migrations_sync/
 db_depends_sync.py
 *_sync.py
 *depreciated.py
+celerybeat-schedule.dir
+celerybeat-schedule.dat
 
 
 .mypy_cache/
