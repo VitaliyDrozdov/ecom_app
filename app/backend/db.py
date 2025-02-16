@@ -12,7 +12,8 @@ class Config:
     DB_USER = os.getenv("POSTGRES_USER")
     DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
     DB_NAME = os.getenv("POSTGRES_DB")
-    DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_NAME}"  # noqa E501
+    # DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_NAME}"  # noqa E501
+    DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@db:5432/{DB_NAME}"  # noqa E501
 
 
 engine = create_async_engine(Config.DATABASE_URL, echo=True)

@@ -21,7 +21,8 @@ db_depends_sync.py
 *depreciated.py
 celerybeat-schedule.dir
 celerybeat-schedule.dat
-
+celerybeat-schedule.bak
+Dockerfile_examplec
 
 .mypy_cache/
 __pycache__/
