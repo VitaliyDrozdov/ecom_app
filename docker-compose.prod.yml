@@ -36,7 +36,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./cerbot/www:/var/www:certbot
     command: certonly --webroot --webroot-path=/var/www/certbot/ --email vitdrzdv@mail.ru --agree-tos --no-eff-email -d drecom.ddns.net
-    depends on:
+    depends_on:
       - nginx
         
 volumes:
